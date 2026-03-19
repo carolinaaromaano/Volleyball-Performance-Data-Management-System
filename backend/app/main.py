@@ -1,4 +1,5 @@
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from . import crud, database, models, schemas
@@ -11,6 +12,18 @@ models.Base.metadata.create_all(bind=database.engine)
 app = FastAPI(
     title="Volleyball Performance Data Management API",
     version="0.1.0",
+)
+
+# Dev helper: allow React (Vite) to call the API.
+# If you deploy, set explicit origins instead of "*".
+app.add_middleware(
+    CORSMiddleware,
+    # Dev: allow any origin so the React dev server can reach the API.
+    # We're using Authorization headers (not cookies), so credentials are not required.
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

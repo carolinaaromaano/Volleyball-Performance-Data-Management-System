@@ -1,3 +1,4 @@
+from datetime import date
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
@@ -134,7 +135,57 @@ def create_training_session(
 
 
 def get_training_sessions(
-    db: Session, skip: int = 0, limit: int = 100
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+    team_id: Optional[int] = None,
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+    session_type: Optional[str] = None,
 ) -> List[models.TrainingSession]:
-    return db.query(models.TrainingSession).offset(skip).limit(limit).all()
+    query = db.query(models.TrainingSession)
+    if team_id is not None:
+        query = query.filter(models.TrainingSession.team_id == team_id)
+    if date_from is not None:
+        query = query.filter(models.TrainingSession.date >= date_from)
+    if date_to is not None:
+        query = query.filter(models.TrainingSession.date <= date_to)
+    if session_type is not None:
+        query = query.filter(models.TrainingSession.type == session_type)
+    return query.offset(skip).limit(limit).all()
+
+
+def get_training_session(
+    db: Session, session_id: int
+) -> Optional[models.TrainingSession]:
+    return (
+        db.query(models.TrainingSession)
+        .filter(models.TrainingSession.id == session_id)
+        .first()
+    )
+
+
+def update_training_session(
+    db: Session,
+    session_id: int,
+    session_in: schemas.TrainingSessionCreate,
+) -> Optional[models.TrainingSession]:
+    db_session = get_training_session(db, session_id=session_id)
+    if not db_session:
+        return None
+    for field, value in session_in.model_dump().items():
+        setattr(db_session, field, value)
+    db.add(db_session)
+    db.commit()
+    db.refresh(db_session)
+    return db_session
+
+
+def delete_training_session(db: Session, session_id: int) -> bool:
+    db_session = get_training_session(db, session_id=session_id)
+    if not db_session:
+        return False
+    db.delete(db_session)
+    db.commit()
+    return True
 
