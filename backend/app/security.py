@@ -6,7 +6,7 @@ from passlib.context import CryptContext
 
 from . import schemas
 
-SECRET_KEY = "CHANGE_THIS_SECRET_KEY_FOR_PRODUCTION"  # para TFG local está bien así
+SECRET_KEY = "CHANGE_THIS_SECRET_KEY_FOR_PRODUCTION"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
