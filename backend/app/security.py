@@ -5,8 +5,8 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from . import schemas
+from .config import SECRET_KEY
 
-SECRET_KEY = "CHANGE_THIS_SECRET_KEY_FOR_PRODUCTION"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 

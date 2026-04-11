@@ -2,20 +2,18 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from . import crud, database, models, schemas
+from . import crud, schemas
 from .database import get_db
 from .routers import auth, players, sessions, teams
 
-
-models.Base.metadata.create_all(bind=database.engine)
+# DB schema: use Alembic from `backend/` → `python -m alembic upgrade head`
 
 app = FastAPI(
     title="Volleyball Performance Data Management API",
     version="0.1.0",
 )
 
-# Dev helper: allow React (Vite) to call the API.
-# If you deploy, set explicit origins instead of "*".
+
 app.add_middleware(
     CORSMiddleware,
     # Dev: allow any origin so the React dev server can reach the API.
