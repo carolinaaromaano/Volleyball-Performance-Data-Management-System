@@ -8,21 +8,30 @@ Web app and **REST API** for managing volleyball performance-related data: **Fas
 
 - **FastAPI** with interactive docs at `/docs`.
 - **JWT authentication**: `POST /auth/token` (OAuth2 password flow), `GET /auth/me`.
-- **Users** with roles `coach` and `analyst`.
+- **Users** with roles `coach`, `analyst`, and `admin`.
 - **Teams** (`/teams`): create, list, get by id, update, delete (deleting a team removes its players and training sessions).
 - **Players** (`/players`): full CRUD and list with optional filters `team_id` and `position`.
-- **Training sessions** (`/sessions`): full CRUD and list with optional filters `team_id`, `date_from`, `date_to`, `type`.
+- **Training sessions and matches** (`/sessions`): full CRUD and list with optional filters `team_id`, `date_from`, `date_to`, `type`. Sessions can be marked as matches and linked to an opponent team.
+- **Structured stats** (`/stats/entry`): record per-player stats by category (attack, serve, reception, block).
+- **Charts** (`/stats/teams/{team_id}/players-chart`): per-player breakdown for donut charts (general or filtered by one session).
+- **Match stats (point-by-point)** (`/match-stats`): store lineups by set and log point events (with undo last).
+- **Scouting** (`/scouting`): coaches can view teams in the same category and analyze player charts and insights.
+- **Model-based scouting insights** (`/scouting/teams/{team_id}/insights`): volume-aware rates (Bayesian Beta-Binomial) to avoid “best %” being dominated by small samples.
 - **Debug endpoint** `POST /users/seed-coach`: creates user `coach` if missing (default password in endpoint code: `coach123`).
+- **Debug endpoint** `POST /users/seed-admin`: creates an admin user if missing.
 - **Database schema** managed with **Alembic** (migrations under `backend/alembic/versions/`).
 - **Secrets in environment**: `DATABASE_URL` and `SECRET_KEY` in `backend/.env` (see `backend/.env.example`). Do **not** commit `.env`.
 
 ### Frontend (`frontend/`)
 
-- **React 18** + **Vite** + **React Router** (`/login`, `/teams`, `/players`, `/sessions`).
+- **React 18** + **Vite** + **React Router** (`/login`, `/teams`, `/players`, `/sessions`, `/stats`, `/match-stats`, `/scouting`).
 - **Login** page calling `POST /auth/token` (`application/x-www-form-urlencoded`).
 - **Teams** page: list and create.
 - **Players** page: filter by team, list, create (linked to a team).
-- **Sessions** page: filter by team, list, create training sessions (API requires **coach** role to create).
+- **Sessions** page: filter by team, create training sessions and matches (with opponent team selection).
+- **Stats** page: structured stat entry + per-player donut charts (general or by session).
+- **Match stats** page: point-by-point logging, set rules, and PDF export.
+- **Scouting** page: best/worst by action and model-based (volume-aware) insights.
 - JWT stored in `localStorage`; shared header with user info and logout.
 - Styles in `frontend/src/styles.css`.
 
@@ -31,6 +40,7 @@ Web app and **REST API** for managing volleyball performance-related data: **Fas
 - **Python 3.11+** (use whatever version you run locally; some setups use 3.14).
 - **Node.js** + **npm** (for the frontend).
 - **PostgreSQL** running with a database created for the app.
+- **Scientific Python dependencies** (installed via `backend/requirements.txt`) for scouting insights.
 
 ## Setup — Backend
 
