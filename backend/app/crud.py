@@ -313,11 +313,31 @@ def get_match_lineups(db: Session, training_session_id: int) -> List[models.Matc
     )
 
 
+def get_match_lineup(
+    db: Session, training_session_id: int, side: str, set_number: int
+) -> Optional[models.MatchLineup]:
+    return (
+        db.query(models.MatchLineup)
+        .filter(models.MatchLineup.training_session_id == training_session_id)
+        .filter(models.MatchLineup.side == side)
+        .filter(models.MatchLineup.set_number == set_number)
+        .first()
+    )
+
+
 def create_match_point_event(
     db: Session,
     event_in: schemas.MatchPointEventCreate,
     recorded_by_user_id: int,
 ) -> models.MatchPointEvent:
+    # Guardrail: if DB isn't migrated yet, fail with a clear message.
+    cols = {c["name"] for c in inspect(db.get_bind()).get_columns("match_point_events")}
+    if event_in.event_type == "substitution" and (
+        "player_in_number" not in cols or "player_out_number" not in cols
+    ):
+        raise RuntimeError(
+            "Database is missing substitution columns. Run Alembic migrations: alembic upgrade head"
+        )
     row = models.MatchPointEvent(
         **event_in.model_dump(), recorded_by_user_id=recorded_by_user_id
     )
@@ -330,6 +350,12 @@ def create_match_point_event(
 def get_match_point_events(
     db: Session, training_session_id: int
 ) -> List[models.MatchPointEvent]:
+    # Guardrail: give a clear error if code expects columns not present.
+    cols = {c["name"] for c in inspect(db.get_bind()).get_columns("match_point_events")}
+    if "player_in_number" not in cols or "player_out_number" not in cols:
+        raise RuntimeError(
+            "Database schema is out of date for match substitutions. Run: alembic upgrade head"
+        )
     return (
         db.query(models.MatchPointEvent)
         .filter(models.MatchPointEvent.training_session_id == training_session_id)

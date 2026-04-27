@@ -137,6 +137,8 @@ class MatchPointEvent(Base):
     scoring_side = Column(String, nullable=False)
     event_type = Column(String, nullable=False)
     player_number = Column(Integer, nullable=True)
+    player_in_number = Column(Integer, nullable=True)
+    player_out_number = Column(Integer, nullable=True)
 
     recorded_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)

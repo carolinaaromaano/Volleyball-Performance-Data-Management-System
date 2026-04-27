@@ -325,6 +325,7 @@ MatchEventType = Literal[
     "serve_ace",
     "serve_fault",
     "opponent_error",
+    "substitution",
 ]
 
 
@@ -335,10 +336,20 @@ class MatchPointEventBase(BaseModel):
     scoring_side: MatchSide
     event_type: MatchEventType
     player_number: Optional[int] = Field(None, ge=0)
+    player_in_number: Optional[int] = Field(None, ge=0)
+    player_out_number: Optional[int] = Field(None, ge=0)
 
 
 class MatchPointEventCreate(MatchPointEventBase):
-    pass
+    @model_validator(mode="after")
+    def _validate_substitution(self):
+        if self.event_type == "substitution":
+            if self.player_in_number is None or self.player_out_number is None:
+                raise ValueError("substitution requires player_in_number and player_out_number")
+        else:
+            if self.player_in_number is not None or self.player_out_number is not None:
+                raise ValueError("player_in_number/player_out_number only allowed for substitution")
+        return self
 
 
 class MatchPointEvent(MatchPointEventBase):

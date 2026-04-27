@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { clearToken, fetchMe, getToken } from "../api/client.js";
+import logo from "../assets/brand-logo.png";
 
 export default function AuthenticatedLayout() {
   const [me, setMe] = useState(null);
@@ -30,7 +31,13 @@ export default function AuthenticatedLayout() {
       <div className="shell">
         <aside className="sidebar">
           <div className="sidebar-brand">
-            <span className="badge-dot" aria-hidden="true" />
+            <img
+              src={logo}
+              alt="Volleyball Performance"
+              className="brand-logo"
+              width={40}
+              height={40}
+            />
             <div>
               <p className="sidebar-title">Volleyball Performance</p>
               <p className="sidebar-subtitle">Data Management</p>

@@ -424,6 +424,14 @@ export async function addMatchEvent(matchSessionId, event) {
       event.player_number === "" || event.player_number == null
         ? null
         : Number(event.player_number),
+    player_in_number:
+      event.player_in_number === "" || event.player_in_number == null
+        ? null
+        : Number(event.player_in_number),
+    player_out_number:
+      event.player_out_number === "" || event.player_out_number == null
+        ? null
+        : Number(event.player_out_number),
   };
   const res = await fetch(`${API_BASE_URL}/match-stats/${matchSessionId}/events`, {
     method: "POST",
