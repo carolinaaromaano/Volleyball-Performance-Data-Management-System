@@ -1,22 +1,32 @@
+from contextlib import asynccontextmanager
+
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from . import crud, schemas
+from . import crud, models, schema_bootstrap, schemas
 from .database import get_db
-from .routers import auth, players, sessions, teams
+from .routers import auth, match_stats, players, scouting, sessions, stats, teams
 
-# DB schema: use Alembic from `backend/` → `python -m alembic upgrade head`
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    schema_bootstrap.ensure_teams_demographics_columns()
+    schema_bootstrap.ensure_sessions_match_columns()
+    yield
+
+
 
 app = FastAPI(
     title="Volleyball Performance Data Management API",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 
 app.add_middleware(
     CORSMiddleware,
-    # Dev: allow any origin so the React dev server can reach the API.
+    # Allow any origin so the React dev server can reach the API.
     # We're using Authorization headers (not cookies), so credentials are not required.
     allow_origins=["*"],
     allow_credentials=False,
@@ -34,10 +44,7 @@ def read_root():
 def seed_initial_coach(
     db: Session = Depends(get_db),
 ):
-    """
-    Endpoint rápido para crear un usuario coach inicial en la BD.
-    Úsalo una vez para generar credenciales para probar el login JWT.
-    """
+
     existing = crud.get_user_by_username(db, username="coach")
     if existing:
         return existing
@@ -45,8 +52,27 @@ def seed_initial_coach(
     return crud.create_user(db, user_in)
 
 
+@app.post("/users/seed-admin", response_model=schemas.User, tags=["debug"])
+def seed_initial_admin(
+    db: Session = Depends(get_db),
+):
+
+    existing = crud.get_user_by_username(db, username="admin")
+    if existing:
+        return existing
+    user_in = schemas.UserCreate(
+        username="admin",
+        password="admin123",
+        role=models.RoleEnum.ADMIN.value,
+    )
+    return crud.create_user(db, user_in)
+
+
 app.include_router(auth.router)
 app.include_router(teams.router)
 app.include_router(players.router)
 app.include_router(sessions.router)
+app.include_router(stats.router)
+app.include_router(match_stats.router)
+app.include_router(scouting.router)
 

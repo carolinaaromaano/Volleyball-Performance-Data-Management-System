@@ -68,3 +68,22 @@ async def login_for_access_token(
 async def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
 
+
+@router.post(
+    "/register",
+    response_model=schemas.User,
+    status_code=status.HTTP_201_CREATED,
+)
+def register_coach(body: schemas.CoachRegister, db: Session = Depends(get_db)):
+    if crud.get_user_by_username(db, body.username):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already registered",
+        )
+    user_in = schemas.UserCreate(
+        username=body.username,
+        password=body.password,
+        role=models.RoleEnum.COACH.value,
+    )
+    return crud.create_user(db, user_in)
+

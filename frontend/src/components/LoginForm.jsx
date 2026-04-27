@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { login } from "../api/client.js";
 
 export default function LoginForm({ onLoggedIn }) {
@@ -41,8 +42,21 @@ export default function LoginForm({ onLoggedIn }) {
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
-      {error ? <div className="error">{error}</div> : null}
-      <p className="muted" style={{ marginTop: 12, fontSize: 12 }}>
+      {error ? (
+        <div className="alert alert-error" style={{ marginTop: 12 }}>
+          <div className="alert-icon" aria-hidden="true">
+            !
+          </div>
+          <div>
+            <p className="alert-title">Login failed</p>
+            <p className="alert-text">{error}</p>
+          </div>
+        </div>
+      ) : null}
+      <p className="muted" style={{ marginTop: 12, fontSize: 14 }}>
+        <Link to="/register">Create coach account</Link>
+      </p>
+      <p className="muted" style={{ marginTop: 8, fontSize: 12 }}>
         Default seed: <code>coach</code> / <code>coach123</code>
       </p>
     </div>

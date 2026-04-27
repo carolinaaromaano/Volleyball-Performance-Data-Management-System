@@ -9,3 +9,5 @@ passlib[bcrypt]
 pydantic
 python-multipart
 bcrypt==3.2.0
+numpy
+scikit-learn
