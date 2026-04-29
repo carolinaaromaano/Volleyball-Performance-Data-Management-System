@@ -52,7 +52,7 @@ export default function StatsPage() {
 
   const [category, setCategory] = useState("attack");
   const [playerId, setPlayerId] = useState("");
-  const [statScope, setStatScope] = useState("general"); // general | training | match
+  const [statScope, setStatScope] = useState("general");
   const [sessionId, setSessionId] = useState("");
 
   const [attackPoints, setAttackPoints] = useState("");
@@ -260,7 +260,6 @@ export default function StatsPage() {
         try {
           await refreshCharts();
         } catch {
-          /* ignore chart refresh errors here */
         }
       }
     } catch (err) {

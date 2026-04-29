@@ -115,24 +115,20 @@ class StatEntryCreate(BaseModel):
     training_session_id: Optional[int] = None
     category: StatCategory
 
-    # Attack (same structure as serve)
     attack_points: int = Field(0, ge=0, description="Direct points / kills")
     attack_faults: int = Field(0, ge=0)
     attack_rally_continues: int = Field(
         0, ge=0, description="Rally continues (in play, no point)"
     )
 
-    # Reception
     reception_positives: int = Field(0, ge=0)
     reception_double_positives: int = Field(0, ge=0)
     reception_faults: int = Field(0, ge=0)
 
-    # Serve (same structure as attack)
     serve_points: int = Field(0, ge=0, description="Aces / direct points")
     serve_faults: int = Field(0, ge=0)
     serve_rally_continues: int = Field(0, ge=0)
 
-    # Block
     blocks: int = Field(0, ge=0, description="Blocks (in play / scored)")
     blocks_out: int = Field(0, ge=0, description="Blocks out (ball out)")
 

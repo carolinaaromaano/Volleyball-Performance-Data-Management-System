@@ -1,11 +1,10 @@
 import React, { useMemo } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
-// Warmer palette (closer to classic volleyball analysis UIs).
-const C_ATTACK = ["#f59e0b", "#fb923c", "#fbbf24"]; // orange
-const C_SERVE = ["#f97316", "#fdba74", "#ea580c"]; // orange-red
-const C_RECEPTION = ["#22c55e", "#86efac", "#16a34a"]; // green
-const C_BLOCK = ["#3b82f6", "#93c5fd"]; // blue
+const C_ATTACK = ["#f59e0b", "#fb923c", "#fbbf24"];
+const C_SERVE = ["#f97316", "#fdba74", "#ea580c"];
+const C_RECEPTION = ["#22c55e", "#86efac", "#16a34a"];
+const C_BLOCK = ["#3b82f6", "#93c5fd"];
 
 function pct(value, total) {
   if (!total) return 0;
@@ -22,7 +21,6 @@ function DonutTooltip({ active, payload }) {
   const p = payload[0];
   const name = p?.name ?? "";
   const value = Number(p?.value) || 0;
-  // We include percent in the formatter, but keep it safe here as well.
   const label = p?.payload?.pctLabel;
   return (
     <div

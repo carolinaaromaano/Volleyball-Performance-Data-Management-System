@@ -15,7 +15,6 @@ const genderLabel = (v) =>
 const competitionLabel = (v) =>
   COMPETITION_OPTIONS.find((o) => o.value === v)?.label ?? v ?? "";
 
-/** Suffix like " (Female · National League)"; legacy teams may only have `category`. */
 export function formatTeamExtra(t) {
   if (!t) return "";
   const bits = [];

@@ -1,4 +1,3 @@
-/* Modern UI tokens */
 :root {
   --bg0: #070a12;
   --bg1: #0b1020;
@@ -48,7 +47,6 @@ code {
   margin: 0 auto;
 }
 
-/* Full app layout (sidebar + content) */
 .shell {
   display: grid;
   grid-template-columns: 260px 1fr;
@@ -285,7 +283,6 @@ textarea:focus {
   font-weight: 600;
 }
 
-/* Pretty alerts (errors, info, success) */
 .alert {
   display: flex;
   gap: 10px;
@@ -396,7 +393,6 @@ tbody tr:hover td {
   justify-content: space-between;
 }
 
-/* Per-player stats charts */
 .player-chart-card {
   margin-top: 18px;
   padding: 16px;
@@ -442,7 +438,6 @@ tbody tr:hover td {
   min-height: 200px;
 }
 
-/* Donut charts */
 .donut-wrap {
   position: relative;
   min-height: 220px;
@@ -599,7 +594,6 @@ tbody tr:hover td {
   font-weight: 600;
 }
 
-/* Segmented control (used for View toggle, etc.) */
 .segmented {
   display: inline-flex;
   flex-wrap: wrap;
@@ -661,7 +655,6 @@ tbody tr:hover td {
   box-shadow: 0 0 0 4px var(--ring), 0 0 0 1px rgba(167, 139, 250, 0.45);
 }
 
-/* Two-tab toggle (Stats "View") */
 .toggle-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;

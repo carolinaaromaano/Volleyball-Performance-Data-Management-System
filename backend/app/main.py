@@ -26,8 +26,6 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    # Allow any origin so the React dev server can reach the API.
-    # We're using Authorization headers (not cookies), so credentials are not required.
     allow_origins=["*"],
     allow_credentials=False,
     allow_methods=["*"],

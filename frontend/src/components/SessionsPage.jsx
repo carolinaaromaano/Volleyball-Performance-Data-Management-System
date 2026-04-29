@@ -22,7 +22,7 @@ export default function SessionsPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const [mode, setMode] = useState("training"); // training | match
+  const [mode, setMode] = useState("training");
   const [date, setDate] = useState(todayISODate);
   const [type, setType] = useState("");
   const [notes, setNotes] = useState("");

@@ -4,7 +4,6 @@ const API_BASE_URL =
 const TOKEN_KEY = "vp_token";
 
 async function readApiError(res) {
-  // Try JSON first (FastAPI usually returns {"detail": "..."}).
   try {
     const data = await res.json();
     if (data && typeof data === "object") {
@@ -13,17 +12,14 @@ async function readApiError(res) {
     }
     return JSON.stringify(data);
   } catch {
-    // Fallback to plain text.
     try {
       const text = await res.text();
-      // Sometimes an API returns JSON-as-text; unwrap {"detail": "..."} if so.
       const trimmed = (text || "").trim();
       if (trimmed.startsWith("{") && trimmed.includes("\"detail\"")) {
         try {
           const data = JSON.parse(trimmed);
           if (data && typeof data.detail === "string") return data.detail;
         } catch {
-          // ignore
         }
       }
       return text || `${res.status} ${res.statusText}`;
@@ -64,7 +60,6 @@ export async function registerCoach(username, password) {
 }
 
 export async function login(username, password) {
-  // OAuth2PasswordRequestForm expects x-www-form-urlencoded
   const body = new URLSearchParams();
   body.append("username", username);
   body.append("password", password);
@@ -283,7 +278,6 @@ export async function fetchTeamStatsSummary(teamId) {
   return res.json();
 }
 
-/** Per-player totals for charts (general or filtered by training session). */
 export async function fetchTeamPlayerChartData(teamId, { trainingSessionId } = {}) {
   const qs = buildQuery({
     training_session_id:
@@ -329,7 +323,6 @@ export async function createStat(stat) {
   return res.json();
 }
 
-/** Structured stat entry (player + category + counts). */
 export async function createStatEntry(entry) {
   const body = {
     team_id: Number(entry.team_id),

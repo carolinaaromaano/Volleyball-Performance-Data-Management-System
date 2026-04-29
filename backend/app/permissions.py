@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 
 from . import models
 
-# Roles allowed to call coach/analyst API routes (teams, players, sessions, stats).
 API_STAFF_ROLES = [
     models.RoleEnum.COACH.value,
     models.RoleEnum.ANALYST.value,

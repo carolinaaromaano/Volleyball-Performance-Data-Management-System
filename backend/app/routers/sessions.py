@@ -47,14 +47,12 @@ def create_session(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Team or opponent team not found",
             )
-        # Same category = same gender + same competition.
         if team.gender != opp.gender or team.competition != opp.competition:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Opponent team must be in the same category (gender and competition)",
             )
     else:
-        # Ensure opponent is not accidentally set for training sessions.
         if session_in.opponent_team_id is not None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

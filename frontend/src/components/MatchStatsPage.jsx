@@ -183,7 +183,6 @@ function downloadPdf({ team, matchSession, lineups, events }) {
     y += lines.length * lineHeight;
   }
 
-  // ---- Header
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
   doc.setTextColor(...COLORS.ink);
@@ -223,7 +222,6 @@ function downloadPdf({ team, matchSession, lineups, events }) {
   );
   y += 8;
 
-  // ---- Set summary
   sectionTitle("Set summary");
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
@@ -242,7 +240,6 @@ function downloadPdf({ team, matchSession, lineups, events }) {
   }
   y += 2;
 
-  // ---- Starting rotation
   const set1HomeRot = [
     set1Home?.p1,
     set1Home?.p2,
@@ -270,7 +267,6 @@ function downloadPdf({ team, matchSession, lineups, events }) {
   writeWrapped(`${awayName}: ${set1AwayRot || "—"}`, { fontSize: 11, color: COLORS.ink });
   y += 3;
 
-  // ---- Summary counts
   const allTypes = EVENT_OPTIONS.map((o) => o.value);
   const homeCounts = countByEvent(events, "home");
   const awayCounts = countByEvent(events, "away");
@@ -295,7 +291,6 @@ function downloadPdf({ team, matchSession, lineups, events }) {
   }
   y += 2;
 
-  // ---- Point log by set (styled table)
   sectionTitle("Point log (by set)");
 
   const tableX = marginX;
@@ -308,6 +303,14 @@ function downloadPdf({ team, matchSession, lineups, events }) {
   };
   const tableW = col.rally + col.score + col.side + col.action + col.player;
   const rowH = 6.2;
+
+  function rotationLabel(lineup) {
+    if (!lineup) return "—";
+    const xs = [lineup.p1, lineup.p2, lineup.p3, lineup.p4, lineup.p5, lineup.p6]
+      .filter((n) => n != null && String(n).trim() !== "")
+      .map((n) => `#${String(n).trim()}`);
+    return xs.length ? xs.join(", ") : "—";
+  }
 
   function drawTableHeader() {
     ensureSpace(rowH + 2);
@@ -369,6 +372,31 @@ function downloadPdf({ team, matchSession, lineups, events }) {
       doc.setTextColor(...COLORS.muted);
       doc.text(`Winner: ${winnerName}`, marginX, y);
       y += 7;
+
+      const setHome = lineups.find(
+        (l) => l.side === "home" && Number(l.set_number) === Number(sn)
+      );
+      const setAway = lineups.find(
+        (l) => l.side === "away" && Number(l.set_number) === Number(sn)
+      );
+      ensureSpace(14);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(...COLORS.ink);
+      doc.text(`Rotations (set ${sn})`, marginX, y);
+      y += 6;
+      writeWrapped(`${homeName}: ${rotationLabel(setHome)}`, {
+        fontSize: 10.5,
+        color: COLORS.ink,
+        lineHeight: 5.2,
+      });
+      y += 0.8;
+      writeWrapped(`${awayName}: ${rotationLabel(setAway)}`, {
+        fontSize: 10.5,
+        color: COLORS.ink,
+        lineHeight: 5.2,
+      });
+      y += 4;
 
       drawTableHeader();
 
@@ -564,6 +592,18 @@ export default function MatchStatsPage() {
       lineupsByKey.get(`away:${Number(setNumber)}`)
   );
 
+  const rotationsComplete = useMemo(() => {
+    const keys = ["p1", "p2", "p3", "p4", "p5", "p6"];
+    const filled = (rot) =>
+      keys.every((k) => {
+        const v = rot?.[k];
+        if (v == null) return false;
+        const s = String(v).trim();
+        return s !== "";
+      });
+    return filled(homeRot) && filled(awayRot);
+  }, [homeRot, awayRot]);
+
   useEffect(() => {
     if (!selectedMatch) return;
     const home = lineupsByKey.get(`home:${Number(setNumber)}`) || null;
@@ -594,7 +634,6 @@ export default function MatchStatsPage() {
     } else {
       setAwayRot({ p1: "", p2: "", p3: "", p4: "", p5: "", p6: "" });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMatch, setNumber, lineupsByKey]);
 
   useEffect(() => {
@@ -925,6 +964,46 @@ export default function MatchStatsPage() {
               </div>
             </div>
           ) : null}
+
+          <div className="card" style={{ padding: 14, marginBottom: 12 }}>
+            <h4 className="title" style={{ fontSize: 14, marginTop: 0 }}>
+              Rotations (set {setNumber})
+            </h4>
+            <div className="grid-2" style={{ alignItems: "start" }}>
+              <RotationEditor
+                title="Home"
+                teamName={homeName}
+                setTeamName={setHomeName}
+                rotation={homeRot}
+                setRotation={setHomeRot}
+                disabled={!selectedMatch || loading}
+              />
+              <RotationEditor
+                title="Away"
+                teamName={awayName}
+                setTeamName={setAwayName}
+                rotation={awayRot}
+                setRotation={setAwayRot}
+                disabled={!selectedMatch || loading}
+              />
+            </div>
+            <div className="row" style={{ marginTop: 12 }}>
+              <button
+                type="button"
+                className="btn"
+                onClick={onSaveLineups}
+                disabled={!selectedMatch || loading || !rotationsComplete}
+              >
+                Save rotations
+              </button>
+              {!rotationsComplete ? (
+                <div className="muted" style={{ fontSize: 12 }}>
+                  Fill positions 1-6 for both teams to continue.
+                </div>
+              ) : null}
+            </div>
+          </div>
+
           <div className="grid-2">
             <div className="field" style={{ marginBottom: 0 }}>
               <label>Set</label>
@@ -1077,36 +1156,6 @@ export default function MatchStatsPage() {
       </div>
 
       <div style={{ height: 16 }} />
-
-      <div className="grid-2" style={{ alignItems: "start" }}>
-        <RotationEditor
-          title="Home"
-          teamName={homeName}
-          setTeamName={setHomeName}
-          rotation={homeRot}
-          setRotation={setHomeRot}
-          disabled={!selectedMatch || loading}
-        />
-        <RotationEditor
-          title="Away"
-          teamName={awayName}
-          setTeamName={setAwayName}
-          rotation={awayRot}
-          setRotation={setAwayRot}
-          disabled={!selectedMatch || loading}
-        />
-      </div>
-
-      <div className="row" style={{ marginTop: 12 }}>
-        <button
-          type="button"
-          className="btn"
-          onClick={onSaveLineups}
-          disabled={!selectedMatch || loading}
-        >
-          Save rotations
-        </button>
-      </div>
 
       <div style={{ height: 18 }} />
 

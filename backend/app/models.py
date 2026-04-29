@@ -82,7 +82,6 @@ class TrainingSession(Base):
     team = relationship("Team", back_populates="sessions", foreign_keys=[team_id])
     stat_records = relationship("StatRecord", back_populates="training_session")
 
-    # Match support (optional)
     is_match = Column(Boolean, default=False, nullable=False)
     opponent_team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
     opponent_team = relationship("Team", foreign_keys=[opponent_team_id])

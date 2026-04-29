@@ -110,7 +110,7 @@ def add_event(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Payload does not match path",
         )
-    # Require lineups for this set before recording any events (points or substitutions).
+
     home_lineup = crud.get_match_lineup(db, match_session_id, "home", body.set_number)
     away_lineup = crud.get_match_lineup(db, match_session_id, "away", body.set_number)
     if not home_lineup or not away_lineup:

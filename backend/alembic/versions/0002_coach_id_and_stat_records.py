@@ -21,7 +21,6 @@ def upgrade() -> None:
     bind = op.get_bind()
     insp = inspect(bind)
 
-    # Make this migration safe to run on DBs that already have drift-fixed columns.
     if bind.dialect.name == "postgresql":
         op.execute(sa.text("ALTER TABLE teams ADD COLUMN IF NOT EXISTS coach_id INTEGER"))
         op.execute(
@@ -43,7 +42,6 @@ def upgrade() -> None:
             )
         )
     else:
-        # Best-effort for non-Postgres: only add if missing.
         cols = {c["name"] for c in insp.get_columns("teams")}
         if "coach_id" not in cols:
             op.add_column("teams", sa.Column("coach_id", sa.Integer(), nullable=True))

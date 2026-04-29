@@ -41,7 +41,6 @@ def list_players(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    # Coaches should only see players from teams they created/own (teams.coach_id == user.id).
     if is_coach(current_user):
         return crud.get_players_for_coach_created_teams(
             db,

@@ -1,4 +1,3 @@
-/** Mirrors backend `can_manage_team` for UI (delete / edit). */
 export function canManageTeam(team, user) {
   if (!user) return false;
   if (user.role === "analyst" || user.role === "admin") return true;

@@ -127,7 +127,6 @@ def delete_team(db: Session, team_id: int) -> bool:
             db.delete(session)
         db.delete(db_team)
     else:
-        # Bulk deletes avoid ORM flush loading stat_records on Player/TrainingSession.
         db.expunge(db_team)
         db.execute(
             delete(models.TrainingSession).where(
@@ -330,7 +329,6 @@ def create_match_point_event(
     event_in: schemas.MatchPointEventCreate,
     recorded_by_user_id: int,
 ) -> models.MatchPointEvent:
-    # Guardrail: if DB isn't migrated yet, fail with a clear message.
     cols = {c["name"] for c in inspect(db.get_bind()).get_columns("match_point_events")}
     if event_in.event_type == "substitution" and (
         "player_in_number" not in cols or "player_out_number" not in cols
@@ -350,7 +348,6 @@ def create_match_point_event(
 def get_match_point_events(
     db: Session, training_session_id: int
 ) -> List[models.MatchPointEvent]:
-    # Guardrail: give a clear error if code expects columns not present.
     cols = {c["name"] for c in inspect(db.get_bind()).get_columns("match_point_events")}
     if "player_in_number" not in cols or "player_out_number" not in cols:
         raise RuntimeError(
@@ -391,7 +388,6 @@ def delete_last_match_point_event(
 def create_stat_record(
     db: Session, stat_in: schemas.StatRecordCreate, recorded_by_user_id: int
 ) -> models.StatRecord:
-    # Older DBs may not have stat_records yet (migration 0002 not applied).
     if not inspect(db.get_bind()).has_table("stat_records"):
         raise RuntimeError(
             "stat_records table does not exist. Run Alembic migrations (upgrade head)."
